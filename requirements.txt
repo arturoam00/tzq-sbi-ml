@@ -1,0 +1,5 @@
+torch
+hydra-core
+matplotlib
+mpl-hep
+"git+https://github.com/arturoam00/madminer.git"

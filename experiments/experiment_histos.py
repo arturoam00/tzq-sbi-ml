@@ -9,8 +9,6 @@ from .plotting import plot_llr
 
 class ExperimentHistos(BaseExperiment):
 
-    # I pass `model=<model object>` to the experiment
-    # constructor in `run.py`. Allow for it here
     def __init__(self, *args, **kwds):
         kwds["key"] = "histos"
         super().__init__(*args, **kwds)
