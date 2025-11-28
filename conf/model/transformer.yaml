@@ -1,0 +1,18 @@
+defaults:
+  - _base
+  - _self_
+
+key: transformer
+net:
+  _target_: models.transformer.Transformer
+  dim_in: ...
+  dim_out: ...
+  emb_factor: 8
+  num_blocks: 2
+  dropout_p: 0.1
+  attention:
+    num_heads: 8
+    increase_hidden_channels: 8
+  mlp:
+    k_factor: 2
+    activation: relu

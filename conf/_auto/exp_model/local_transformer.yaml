@@ -1,0 +1,7 @@
+exp: 
+  _target_: experiments.particles.local.ExperimentLocalParticles
+model:
+  _target_: wrappers.transformer_wrapper.LocalTransformerWrapper
+  net:
+    dim_in: 4
+    dim_out: ${dataset.theta_dim}

@@ -1,0 +1,61 @@
+"""Transformer architecture"""
+
+from dataclasses import replace
+
+import torch.nn as nn
+
+from .configs import MLPConfig, SAConfig
+from .modules.te import TE
+
+
+def derive_emb_hidden(dim_in, emb_factor, num_heads):
+    emb_candidate = dim_in * emb_factor
+    emb = emb_candidate - (emb_candidate % num_heads)
+    return max(emb, num_heads)
+
+
+class Transformer(nn.Module):
+    def __init__(
+        self,
+        dim_in,
+        emb_factor,
+        dim_out,
+        num_blocks,
+        attention,
+        mlp,
+        dropout_p,
+    ):
+        super().__init__()
+
+        emb_hidden = derive_emb_hidden(dim_in, emb_factor, attention.num_heads)
+
+        # configs
+        attention = replace(
+            SAConfig.cast(attention), emb_size=emb_hidden, dropout_p=dropout_p
+        )
+        mlp = replace(
+            MLPConfig.cast(mlp),
+            dim_in=emb_hidden,
+            dim_out=emb_hidden,
+            dropout_p=dropout_p,
+        )
+
+        # layers
+        self.linear_in = nn.Linear(dim_in, emb_hidden)
+        self.te_blocks = nn.ModuleList(
+            [
+                TE(
+                    emb_size=emb_hidden,
+                    attention=attention,
+                    mlp=mlp,
+                )
+                for _ in range(num_blocks)
+            ]
+        )
+        self.linear_out = nn.Linear(emb_hidden, dim_out)
+
+    def forward(self, x, **attn_kwds):
+        x = self.linear_in(x)
+        for layer in self.te_blocks:
+            x = layer(x, **attn_kwds)
+        return self.linear_out(x)

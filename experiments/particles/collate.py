@@ -1,0 +1,57 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Iterable, List, Optional
+
+import torch
+
+from .schemas import ParametrizedParticleBatch, ParticleBatch
+
+if TYPE_CHECKING:
+    from .schemas import ParametrizedParticlesEvent, ParticlesEvent
+
+
+def _collate_particles_common(
+    batch: Iterable[ParticlesEvent], extra_attrs: Optional[List[str]] = None
+):
+    """Returns a batch of particles with the batch and event dimensions
+    flattened into one. A pointer is also return to later divide the particles
+    into events"""
+    particles_list, lengths_list, scores_list = [], [], []
+    extra_lists = {attr: [] for attr in (extra_attrs or [])}
+
+    for event in batch:
+        particles_list.append(torch.from_numpy(event.fourmomenta[: event.length]))
+        lengths_list.append(event.length)
+        scores_list.append(torch.from_numpy(event.score))
+        for attr in extra_lists:
+            extra_lists[attr].append(torch.from_numpy(getattr(event, attr)))
+
+    # Pointer for each event
+    lengths = torch.tensor(lengths_list)
+    ptr = torch.zeros(len(batch) + 1)
+    ptr[1:] = torch.cumsum(lengths, dim=0)
+
+    particles = torch.cat(particles_list, dim=0)
+    scores = torch.stack(scores_list, dim=0)
+
+    extras = {attr: torch.stack(lst, dim=0) for attr, lst in extra_lists.items()}
+    return particles, ptr, scores, extras
+
+
+def collate_particles_fn(batch: Iterable[ParticlesEvent]) -> ParticleBatch:
+    particles, ptr, score, _ = _collate_particles_common(batch)
+    return ParticleBatch(particles=particles, ptr=ptr, score=score)
+
+
+def parametrized_collate_particles_fn(batch: Iterable[ParametrizedParticlesEvent]):
+    particles, ptr, score, extras = _collate_particles_common(
+        batch, extra_attrs=["theta", "ratio", "label"]
+    )
+    return ParametrizedParticleBatch(
+        particles=particles,
+        ptr=ptr,
+        score=score,
+        theta=extras["theta"],
+        ratio=extras["ratio"],
+        label=extras["label"],
+    )

@@ -1,0 +1,19 @@
+defaults:
+  - _base
+  - _self_
+
+key: lgatr
+net:
+  _target_: lgatr.LGATr
+  in_mv_channels: ...
+  out_mv_channels: ...
+  num_blocks: 2
+  in_s_channels: 0
+  out_s_channels: 0
+  hidden_mv_channels: 8
+  hidden_s_channels: 16
+  attention: 
+    num_heads: 2
+  mlp: {}
+
+_recursive_: false

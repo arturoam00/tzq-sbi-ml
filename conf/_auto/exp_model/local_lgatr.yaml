@@ -1,0 +1,7 @@
+exp: 
+  _target_: experiments.particles.local.ExperimentLocalParticles
+model:
+  _target_: wrappers.lgatr_wrapper.LocalLGATrWrapper
+  net:
+    in_mv_channels: ${dataset.theta_dim}
+    out_mv_channels: ${dataset.theta_dim}

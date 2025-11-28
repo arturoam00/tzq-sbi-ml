@@ -1,0 +1,6 @@
+exp:
+  _target_: experiments.features.local.ExperimentLocalFeatures
+model:
+  _target_: wrappers.mlp_wrapper.LocalMLPWrapper
+  net:
+    dim_out: ${dataset.theta_dim}

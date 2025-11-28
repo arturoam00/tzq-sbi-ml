@@ -1,0 +1,13 @@
+defaults:
+  - _base
+  - _self_
+
+key: mlp
+net:
+  _target_: models.mlp.MLP
+  n_observables: 33
+  k_hidden: 4
+  hidden_layers: 2
+  activation: gelu
+  dropout: 0.1
+  dim_out: ...
