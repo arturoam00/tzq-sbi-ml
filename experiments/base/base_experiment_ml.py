@@ -122,7 +122,7 @@ class BaseExperimentML(BaseExperiment):
         if self.cfg.modes.recycle and self.checkpoints.state_dict is not None:
             LOGGER.info("Starting warm!")
             self.model.load_state_dict(self.checkpoints.state_dict)
-        self.model.to(**self.device_kwds)
+        self.model = self.model.to(**self.device_kwds)
         LOGGER.info(f"Model moved to {str(self.device_kwds["device"])}")
 
     def loss(self, batch):
@@ -173,7 +173,7 @@ class BaseExperimentML(BaseExperiment):
                 opt.zero_grad()
 
                 # Move data to device and cast to dtype
-                batch.to(**self.device_kwds)
+                batch.to_(**self.device_kwds)
 
                 # Calculate loss on output
                 loss = self.loss(batch)
@@ -226,7 +226,7 @@ class BaseExperimentML(BaseExperiment):
             # the evaluation
             with needs_grad(self.loss_fn.REQUIRES_SCORE):
                 for batch in self.val_loader:
-                    batch.to(**self.device_kwds)
+                    batch.to_(**self.device_kwds)
                     val_loss += self.loss(batch).item()
 
             avg_val_loss = val_loss / len(self.val_loader)
@@ -247,7 +247,7 @@ class BaseExperimentML(BaseExperiment):
         self.model.eval()
         device_kwds = self.device_kwds.copy()
         device_kwds["device"] = device(self.cfg.devices.eval)
-        self.model.to(**device_kwds)
+        self.model = self.model.to(**device_kwds)
         LOGGER.info(f"Model moved to {device_kwds["device"]}")
 
         preds = []
@@ -256,7 +256,7 @@ class BaseExperimentML(BaseExperiment):
             f"Starting to evaluate {len(loader)} minibatches of size {loader.batch_size}"
         )
         for batch in tqdm(loader):
-            batch.to(**device_kwds)
+            batch.to_(**device_kwds)
             output = self._preds(batch)
             preds.append(
                 self._eval(output).detach()

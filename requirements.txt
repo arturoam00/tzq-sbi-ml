@@ -5,3 +5,5 @@ mplhep
 git+https://github.com/arturoam00/madminer.git
 tensorboard
 tqdm
+torch_geometric
+lgatr

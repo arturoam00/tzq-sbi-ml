@@ -24,7 +24,7 @@ class FeaturesBatch:
     x: torch.Tensor
     score: torch.Tensor
 
-    def to(self, **kwargs):
+    def to_(self, **kwargs):
         to_fields(self, **kwargs)
 
 

@@ -11,7 +11,7 @@ def device(key):
 
 
 def dtype(key):
-    DTYPES[key]
+    return DTYPES[key]
 
 
 def to_device(*args: torch.Tensor, device: torch.device, **kwds) -> list[torch.Tensor]:

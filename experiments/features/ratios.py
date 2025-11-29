@@ -16,9 +16,7 @@ class ExperimentRatiosFeatures(BaseExperimentRatios):
 
     def _preds(self, batch: ParametrizedFeaturesBatch):
         batch.theta.requires_grad_(self.loss_fn.REQUIRES_SCORE)
-
         log_ratio_pred = self.model(batch.x, theta=batch.theta)
-
         return self.pack_output(
             theta=batch.theta,
             log_ratio_pred=log_ratio_pred,
