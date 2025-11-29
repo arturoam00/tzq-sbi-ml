@@ -1,7 +1,3 @@
-defaults:
-  - _base
-  - _self_
-
 theta_ranges: [ [-1.0, 1.0], ]
 resolutions: [26]
 asimov: 

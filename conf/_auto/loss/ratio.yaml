@@ -1,2 +1,1 @@
-defaults: 
-  - _losses/rolr@_here_
+_losses/rolr.yaml

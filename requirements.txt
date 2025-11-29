@@ -1,5 +1,7 @@
 torch
 hydra-core
 matplotlib
-mpl-hep
-"git+https://github.com/arturoam00/madminer.git"
+mplhep
+git+https://github.com/arturoam00/madminer.git
+tensorboard
+tqdm

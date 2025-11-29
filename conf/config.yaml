@@ -36,8 +36,8 @@ devices:
 
 modes:
   train: true
-  eval: false
-  plot: false
+  eval: true
+  plot: true
   recycle: false
 
 data:
