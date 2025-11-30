@@ -1,0 +1,6 @@
+_target_: entrypoints.local.submit
+_partial_: true
+
+worker: 
+  _target_: workers.worker.run
+  _partial_: true

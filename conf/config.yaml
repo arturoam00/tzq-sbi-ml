@@ -3,6 +3,7 @@ defaults:
   - exp: ???
   - dataset: ???
   - model: noop
+  - submit: local
 
   # # this only works when `hydra.mode=RUN`. 
   # # I'm doing Python trickery so that it works
@@ -43,4 +44,5 @@ modes:
 data:
   run: 1
   ckpts: checkpoints.pt
-  run_dir: run_dirs/${dataset.key}/${exp.key}/${model.key}/${.run}
+  run_dir_base: run_dirs
+  run_dir: ${.run_dir_base}/${dataset.key}/${exp.key}/${model.key}/${.run}

@@ -1,0 +1,18 @@
+_target_: entrypoints.htc.submit
+_partial_: true
+
+description:
+  executable: scripts/run.sh
+  arguments: '$(input_file_name)'
+  transfer_input_files: '$(input_file)'
+  request_cpus: 2
+  request_gpus: 1
+  request_memory: 2GB
+  error: err.err
+  request_disk: 1GB
+  should_transfer_files: IF_NEEDED
+  when_to_transfer_output: ON_EXIT
+  transfer_output_files: ${data.run_dir_base}/
+  requirements: 'regexp("V100", TARGET.GPUs_DeviceName)'
+  +UseOS: el9
+  +JobCategory: medium

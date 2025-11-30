@@ -20,8 +20,8 @@ def main(cfg: DictConfig):
     # Derive final configuration object
     cfg = derive_config(cfg)
 
-    # Instantiate (partial) experiment, construct with cfg and call it
-    instantiate(cfg.exp)(cfg=cfg)()
+    # Dispatch submission to corresponding sender
+    instantiate(cfg.submit)(cfg=cfg)
 
 
 if __name__ == "__main__":

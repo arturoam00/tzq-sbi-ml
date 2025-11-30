@@ -7,3 +7,4 @@ tensorboard
 tqdm
 torch_geometric
 lgatr
+htcondor
