@@ -3,16 +3,21 @@ _partial_: true
 
 description:
   executable: scripts/run.sh
-  arguments: '$(input_file_name)'
-  transfer_input_files: '$(input_file)'
+  arguments: '$(tarball_name)'
+  transfer_input_files: '$(tarball)'
   request_cpus: 2
-  request_gpus: 1
   request_memory: 2GB
-  error: err.err
+  environment: ENV=${env:prefix};PYTHONPATH=${env:cwd}
+  output: logs/$(Cluster).$(Process).out
+  log: logs/$(Cluster).$(Process).log
+  error: logs/$(Cluster).$(Process).err
   request_disk: 1GB
-  should_transfer_files: IF_NEEDED
+  should_transfer_files: YES
   when_to_transfer_output: ON_EXIT
-  transfer_output_files: ${data.run_dir_base}/
+  transfer_output_files: ${data.run_dir_base}
+  request_gpus: 1
   requirements: 'regexp("V100", TARGET.GPUs_DeviceName)'
-  +UseOS: el9
-  +JobCategory: medium
+
+description_addition:
+  +UseOS: '"el9"'
+  +JobCategory: '"short"'

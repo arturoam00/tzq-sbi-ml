@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import hydra
@@ -13,6 +16,10 @@ if TYPE_CHECKING:
 
 
 OmegaConf.register_new_resolver("sum", lambda x, y: x + y)
+OmegaConf.register_new_resolver(
+    "env",
+    lambda key: {"prefix": Path(sys.executable).parent, "cwd": os.getcwd()}.get(key),
+)
 
 
 @hydra.main(config_name="config", config_path="conf", version_base=None)

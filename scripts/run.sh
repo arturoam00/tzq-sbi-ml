@@ -1,7 +1,16 @@
 #!/bin/bash
 
-micromamba activate ml
+set -euo pipefail
 
-CONFIG="$1"
+setup_env() {
+    PATH="$ENV:$PATH"
+}
 
-python workers/worker.py "$CONFIG"
+setup_env
+
+
+TARBALL="$1"
+tar -xzf "$TARBALL"
+
+python -m workers.worker *.yaml
+

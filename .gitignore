@@ -3,6 +3,8 @@ multirun/
 data/
 run_dirs/
 outputs/
+inputs/
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

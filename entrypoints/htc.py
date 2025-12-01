@@ -1,3 +1,5 @@
+import io
+import tarfile
 import tempfile
 from pathlib import Path
 
@@ -5,16 +7,37 @@ import htcondor2
 from omegaconf import OmegaConf
 
 
-def submit(*, description, cfg):
-    schedd = htcondor2.Schedd()
+def _tarball(cfg):
+    input_dir = Path("inputs")
+    input_dir.mkdir(exist_ok=True, parents=True)
+
+    # Create unique safe name for tarball
+    with tempfile.NamedTemporaryFile(mode="r+", dir=input_dir, suffix=".tar.gz") as tmp:
+        tarball = Path(tmp.name)
+
+    with tarfile.open(tarball, "w:gz") as tar:
+        # Add data and possibly model checkpoints
+        tar.add(cfg.dataset.path)
+        if Path(cfg.data.run_dir).exists():
+            tar.add(cfg.data.run_dir)
+
+        # Add configuration object
+        cfg_encoded = OmegaConf.to_yaml(cfg).encode()
+        info = tarfile.TarInfo(name="input.yaml")
+        info.size = len(cfg_encoded)
+        tar.addfile(info, io.BytesIO(cfg_encoded))
+
+    return tarball
+
+
+def submit(*, description, description_addition={}, cfg):
+    # Prepare job description
     job_description = htcondor2.Submit(dict(description))
+    job_description.update(description_addition)
 
-    with tempfile.NamedTemporaryFile(mode="w+", delete=True) as tmp:
-        # Save config to temporary file
-        OmegaConf.save(cfg, tmp)
+    tb = _tarball(cfg)
+    itemdata = [{"tarball": str(tb), "tarball_name": tb.name}]
 
-        # Data to pass temporary file to node
-        itemdata = {"input_file": tmp.name, "input_file_name": Path(tmp.name).name}
-
-        # Schedule job
-        schedd.submit(description=job_description, itemdata=iter(itemdata))
+    # Schedule job
+    schedd = htcondor2.Schedd()
+    schedd.submit(description=job_description, itemdata=iter(itemdata))
