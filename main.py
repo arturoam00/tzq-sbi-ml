@@ -9,7 +9,7 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from derive_config import derive_config
+from helpers.derive_config import derive_config
 
 if TYPE_CHECKING:
     from omegaconf import DictConfig
