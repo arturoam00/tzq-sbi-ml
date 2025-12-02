@@ -1,4 +1,4 @@
-_target_: entrypoints.htc.submit
+_target_: launchers.htc.submit
 _partial_: true
 
 description:

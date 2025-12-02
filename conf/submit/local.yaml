@@ -1,4 +1,4 @@
-_target_: entrypoints.local.submit
+_target_: launchers.local.submit
 _partial_: true
 
 worker: 
