@@ -21,28 +21,44 @@ class BaseExperimentRatios(BaseExperimentML):
         kwds["key"] = "ratios"
         super().__init__(*args, **kwds)
 
-    def _preds(self, *args, **kwargs):
-        pass
+    def _preds(self, *args, **kwargs) -> ...: ...
 
     def _load_raw_data(self, source):
+        # Get source
         source = Path(source)
-        x_test = np.load(source / "x_test.npy")
-        ratio_train = np.load(source / "r_xz_train_ratio.npy")
-        score_train = np.load(source / "t_xz_train_ratio.npy")
-        labels_train = np.load(source / "y_train_ratio.npy")
+
+        # Get max samples
         max_samples = self.cfg.train.get("clamp_samples", None)
+
+        # Load train data
+        x_train = np.load(source / "x_train_ratio.npy")[:max_samples]
+        theta_train = np.load(source / "theta0_train_ratio.npy")[:max_samples]
+
+        # Load train labels
+        ratio_train = np.load(source / "r_xz_train_ratio.npy")[:max_samples]
+        score_train = np.load(source / "t_xz_train_ratio.npy")[:max_samples]
+        labels_train = np.load(source / "y_train_ratio.npy")[:max_samples]
+
+        # Load test data
+        x_test = np.load(source / "x_test.npy")
+        theta_test = np.load(source / "theta_test.npy")
+
+        # Load test labels TODO: Augment test data (i just put dummy data now)!
+        ratio_test = np.zeros((x_test.shape[0], ratio_train.shape[1]))
+        score_test = np.zeros((x_test.shape[0], score_train.shape[1]))
+        labels_test = np.zeros((x_test.shape[0], labels_train.shape[1]))
+
         return ParametrizedRawData(
-            x_train=np.load(source / "x_train_ratio.npy")[:max_samples],
-            theta_train=np.load(source / "theta0_train_ratio.npy")[:max_samples],
-            ratio_train=ratio_train[:max_samples],
-            score_train=score_train[:max_samples],
-            labels_train=labels_train[:max_samples],
+            x_train=x_train,
+            theta_train=theta_train,
+            ratio_train=ratio_train,
+            score_train=score_train,
+            labels_train=labels_train,
             x_test=x_test,
-            theta_test=np.load(source / "theta_test.npy"),
-            # TODO: Augment test data (i just put dummy data now)!
-            ratio_test=np.zeros((x_test.shape[0], ratio_train.shape[1])),
-            score_test=np.zeros((x_test.shape[0], score_train.shape[1])),
-            labels_test=np.zeros((x_test.shape[0], labels_train.shape[1])),
+            theta_test=theta_test,
+            ratio_test=ratio_test,
+            score_test=score_test,
+            labels_test=labels_test,
         )
 
     def _load_dataset(self, raw: ParametrizedRawData, mode="train"):

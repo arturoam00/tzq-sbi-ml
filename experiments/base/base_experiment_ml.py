@@ -16,6 +16,7 @@ from ..logger import LOGGER as _LOGGER
 from ..plotting import plot_learning_curves, plot_llr
 from ..utils import device, dtype
 from .base_experiment import BaseExperiment
+from .normalizers import get_normalizer
 from .schemas import Losses
 
 if TYPE_CHECKING:
@@ -42,6 +43,7 @@ class BaseExperimentML(BaseExperiment):
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
         self.model = None
+        self.normalizer = None
         self.loss_fn: Optional[Loss] = None
         self.train_loader = self.val_loader = None
         self.train_dataset = self.val_dataset = None
@@ -53,26 +55,23 @@ class BaseExperimentML(BaseExperiment):
         }
 
     @abstractmethod
-    def _load_raw_data(self, *args, **kwds):
-        pass
+    def _load_raw_data(self, *args, **kwds) -> ...: ...
 
     @abstractmethod
-    def _load_dataset(self, raw, mode: Literal["train", "test"] = "train"):
-        pass
+    def _load_dataset(self, raw, mode: Literal["train", "test"] = "train") -> ...: ...
 
     @abstractmethod
-    def _preds(self, batch):
-        pass
+    def _preds(self, batch) -> ...: ...
 
     @abstractmethod
-    def _eval(self, output):
-        pass
+    def _eval(self, output) -> ...: ...
 
     def _init(self) -> None:
         self.init_loss_function()
+        self.init_model()
+        self.init_normalizer()
         self.init_datasets()
         self.init_loaders()
-        self.init_model()
 
     def _run(self) -> None:
         if self.cfg.modes.train:
@@ -89,7 +88,14 @@ class BaseExperimentML(BaseExperiment):
         self.loss_fn = instantiate(self.cfg.loss)
 
     def init_datasets(self) -> None:
+        # Load raw data
         raw = self._load_raw_data(self.cfg.dataset.path)
+
+        # Normalize raw
+        raw.x_train = self.normalizer.fit_transform(raw.x_train)
+        raw.x_test = self.normalizer.transform(raw.x_test)
+
+        # Create datasets
         dataset = self._load_dataset(raw, "train")
 
         split = self.cfg.train.validation_split
@@ -124,6 +130,9 @@ class BaseExperimentML(BaseExperiment):
             self.model.load_state_dict(self.checkpoints.state_dict)
         self.model = self.model.to(**self.device_kwds)
         LOGGER.info(f"Model moved to {str(self.device_kwds["device"])}")
+
+    def init_normalizer(self) -> None:
+        self.normalizer = get_normalizer(str(self.model))
 
     def loss(self, batch):
         return self.loss_fn(self._preds(batch))
@@ -332,6 +341,7 @@ class BaseExperimentML(BaseExperiment):
                 test_split=self.cfg.limits.test_split,
                 thetas=theta_grid,
             )
+            x_train = self.normalizer.transform(x_train)
             LOGGER.info(f"Sampled {len(x_train)} train events")
             train_dataset = self.dataset_cls(x=x_train, theta=theta_grid)
             train_loader = DataLoader(
@@ -353,6 +363,7 @@ class BaseExperimentML(BaseExperiment):
 
     def create_lims_loaders(self, x, theta=None):
         factory_kwds = {"batch_size": 100, "collate_fn": self.collate_fn}
+        x = self.normalizer.transform(x)
         if theta is None:
             return [DataLoader(self.dataset_cls(x=x), **factory_kwds)]
         return [

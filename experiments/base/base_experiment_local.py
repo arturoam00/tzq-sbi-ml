@@ -21,15 +21,24 @@ class BaseExperimentLocal(BaseExperimentML):
         pass
 
     def _load_raw_data(self, source):
+        # Get source
         source = Path(source)
-        x_test = np.load(source / "x_test.npy")
+
+        # Get max samples
         max_samples = self.cfg.train.get("clamp_samples", None)
+
+        # Load raw data
+        x_train = np.load(source / "x_train_score.npy")[:max_samples]
+        x_test = np.load(source / "x_test.npy")
+
+        # Load labels. TODO: Load test labels
+        score_train = np.load(source / "t_xz_train_score.npy")[:max_samples]
         dummy_scores = np.zeros((len(x_test), self.cfg.dataset.theta_dim))
+
         return RawData(
-            x_train=np.load(source / "x_train_score.npy")[:max_samples],
-            score_train=np.load(source / "t_xz_train_score.npy")[:max_samples],
+            x_train=x_train,
+            score_train=score_train,
             x_test=x_test,
-            # TODO: Fix below! (add augmented data to test data)
             score_test=dummy_scores,
         )
 
