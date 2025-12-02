@@ -5,8 +5,8 @@ description:
   executable: scripts/run.sh
   arguments: '$(tarball_name)'
   transfer_input_files: '$(tarball)'
-  request_cpus: 2
-  request_memory: 2GB
+  request_cpus: 4
+  request_memory: 10GB
   environment: ENV=${env:prefix};PYTHONPATH=${env:cwd}
   output: logs/$(Cluster).$(Process).out
   log: logs/$(Cluster).$(Process).log
