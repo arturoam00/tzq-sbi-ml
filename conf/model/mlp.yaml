@@ -9,5 +9,5 @@ net:
   k_hidden: 4
   hidden_layers: 2
   activation: gelu
-  dropout: 0.1
+  dropout: ${train.dropout}
   dim_out: ...

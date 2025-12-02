@@ -11,6 +11,9 @@ if TYPE_CHECKING:
 
 
 def run(cfg: DictConfig):
+    print(
+        f"exp={cfg.exp.key} model={cfg.model.key} dataset={cfg.dataset.key} run={cfg.data.run}"
+    )
     instantiate(cfg.exp)(cfg=cfg)()
 
 

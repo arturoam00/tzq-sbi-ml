@@ -12,6 +12,7 @@ net:
   out_s_channels: 0
   hidden_mv_channels: 8
   hidden_s_channels: 16
+  dropout_prob: ${train.dropout}
   attention: 
     num_heads: 2
   mlp: {}

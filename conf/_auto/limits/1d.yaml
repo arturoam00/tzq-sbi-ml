@@ -1,4 +1,4 @@
 theta_ranges: [ [-1.0, 1.0], ]
-resolutions: [26]
+resolutions: [21]
 asimov: 
   theta_true: [0.0]
