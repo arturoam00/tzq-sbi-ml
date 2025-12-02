@@ -30,7 +30,7 @@ def _tarball(cfg):
     return tarball
 
 
-def submit(*, description, description_addition={}, cfg):
+def launch(*, description, description_addition={}, cfg):
     # Prepare job description
     job_description = htcondor2.Submit(dict(description))
     job_description.update(description_addition)

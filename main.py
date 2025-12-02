@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from omegaconf import DictConfig
 
 
-OmegaConf.register_new_resolver("sum", lambda x, y: x + y)
 OmegaConf.register_new_resolver(
     "env",
     lambda key: {"prefix": Path(sys.executable).parent, "cwd": os.getcwd()}.get(key),
@@ -24,11 +23,8 @@ OmegaConf.register_new_resolver(
 
 @hydra.main(config_name="config", config_path="conf", version_base=None)
 def main(cfg: DictConfig):
-    # Derive final configuration object
     cfg = derive_config(cfg)
-
-    # Dispatch submission to corresponding sender
-    instantiate(cfg.submit)(cfg=cfg)
+    instantiate(cfg.launcher)(cfg=cfg)
 
 
 if __name__ == "__main__":

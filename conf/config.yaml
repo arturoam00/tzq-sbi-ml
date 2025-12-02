@@ -3,7 +3,7 @@ defaults:
   - exp: ???
   - dataset: ???
   - model: noop
-  - submit: local
+  - launcher: local
 
   # # this only works when `hydra.mode=RUN`. 
   # # I'm doing Python trickery so that it works

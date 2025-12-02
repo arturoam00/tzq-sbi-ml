@@ -9,6 +9,7 @@ from omegaconf import OmegaConf
 if TYPE_CHECKING:
     from omegaconf import DictConfig
 
+OmegaConf.register_new_resolver("sum", lambda x, y: x + y)
 
 def run(cfg: DictConfig):
     print(
