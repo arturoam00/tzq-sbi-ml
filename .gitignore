@@ -5,6 +5,7 @@ run_dirs/
 outputs/
 inputs/
 logs/
+*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
